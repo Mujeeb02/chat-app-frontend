@@ -55,7 +55,7 @@ export default function AuthForm() {
 
   const handleOAuthLogin = (provider: 'google' | 'github') => {
     // Redirect to OAuth endpoint
-    const oauthUrl = `http://localhost:3001/api/auth/${provider}`;
+    const oauthUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/${provider}`;
     window.location.href = oauthUrl;
   };
 
