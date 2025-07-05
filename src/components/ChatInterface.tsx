@@ -10,6 +10,7 @@ import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import LoadingSpinner from './LoadingSpinner';
 import CallModal from './CallModal';
+import MobileHeader from './MobileHeader';
 
 export default function ChatInterface() {
   const { user } = useAuthStore();
@@ -131,8 +132,8 @@ export default function ChatInterface() {
 
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-gray-800">
-      {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      {/* Desktop Chat Header */}
+      <div className="hidden lg:flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="flex items-center space-x-3">
           {/* Chat Avatar */}
           <div className="relative">

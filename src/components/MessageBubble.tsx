@@ -138,8 +138,8 @@ export default function MessageBubble({ message, isOwnMessage }: MessageBubblePr
   };
 
   return (
-    <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-      <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+    <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} px-2 sm:px-4`}>
+      <div className={`flex items-end space-x-2 max-w-[280px] sm:max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
         {/* Avatar */}
         {!isOwnMessage && (
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -167,7 +167,7 @@ export default function MessageBubble({ message, isOwnMessage }: MessageBubblePr
           )}
 
           {/* Message Bubble */}
-          <div className={`relative group px-4 py-2 rounded-2xl ${
+          <div className={`relative group px-3 sm:px-4 py-2 rounded-2xl ${
             isOwnMessage 
               ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
               : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'

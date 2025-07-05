@@ -9,6 +9,7 @@ import SocketDebug from "@/components/SocketDebug";
 import ProfileModal from "@/components/ProfileModal";
 import NotificationPanel from "@/components/NotificationPanel";
 import CreateChatModal from "@/components/CreateChatModal";
+import ThemeProvider from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -82,38 +83,40 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
           <SocketProvider>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-              {children}
-            </div>
-            <SocketStatus />
-            <SocketDebug />
-            <ProfileModal />
-            <NotificationPanel />
-            <CreateChatModal />
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: '#363636',
-                  color: '#fff',
-                },
-                success: {
-                  duration: 3000,
-                  iconTheme: {
-                    primary: '#22c55e',
-                    secondary: '#fff',
+            <ThemeProvider>
+              <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                {children}
+              </div>
+              {/* <SocketStatus /> */}
+              {/* <SocketDebug /> */}
+              <ProfileModal />
+              <NotificationPanel />
+              <CreateChatModal />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: '#363636',
+                    color: '#fff',
                   },
-                },
-                error: {
-                  duration: 5000,
-                  iconTheme: {
-                    primary: '#ef4444',
-                    secondary: '#fff',
+                  success: {
+                    duration: 3000,
+                    iconTheme: {
+                      primary: '#22c55e',
+                      secondary: '#fff',
+                    },
                   },
-                },
-              }}
-            />
+                  error: {
+                    duration: 5000,
+                    iconTheme: {
+                      primary: '#ef4444',
+                      secondary: '#fff',
+                    },
+                  },
+                }}
+              />
+            </ThemeProvider>
           </SocketProvider>
         </Providers>
       </body>

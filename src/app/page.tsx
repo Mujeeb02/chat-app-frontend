@@ -3,8 +3,7 @@
 import { useEffect } from 'react';
 import useAuthStore from '@/store/authStore';
 import AuthForm from '@/components/AuthForm';
-import Sidebar from '@/components/Sidebar';
-import ChatInterface from '@/components/ChatInterface';
+import MobileLayout from '@/components/MobileLayout';
 import CreateChatModal from '@/components/CreateChatModal';
 import ProfileModal from '@/components/ProfileModal';
 import NotificationPanel from '@/components/NotificationPanel';
@@ -47,17 +46,13 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen flex bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Sidebar */}
-      <Sidebar />
-      
-      {/* Main Chat Interface */}
-      <ChatInterface />
+    <>
+      <MobileLayout />
       
       {/* Modals */}
       <CreateChatModal />
       <ProfileModal />
       <NotificationPanel />
-    </div>
+    </>
   );
 }

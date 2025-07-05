@@ -205,7 +205,7 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
   };
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 sm:p-4">
       {/* File Preview */}
       {filePreview && (
         <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -280,7 +280,7 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex items-end gap-3">
+      <form onSubmit={handleSubmit} className="flex items-end gap-2 sm:gap-3">
         {/* Emoji Button */}
         <div className="relative">
           <button
@@ -337,7 +337,7 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
             onChange={(e) => handleTyping(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[44px] max-h-[120px]"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[44px] max-h-[120px] text-sm sm:text-base"
             rows={1}
           />
           

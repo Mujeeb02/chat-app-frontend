@@ -40,6 +40,7 @@ interface UIStoreState {
   showSearch: boolean;
   showNotifications: boolean;
   showCallControls: boolean;
+  showThemeSelector: boolean;
   isTyping: boolean;
   typingUsers: Record<string, string[]>;
 }
@@ -58,6 +59,7 @@ interface UIStoreActions {
   toggleSearch: () => void;
   toggleNotifications: () => void;
   toggleCallControls: () => void;
+  toggleThemeSelector: () => void;
   setTyping: (isTyping: boolean) => void;
   addTypingUser: (chatId: string, userId: string) => void;
   removeTypingUser: (chatId: string, userId: string) => void;
@@ -83,6 +85,7 @@ const useUIStore = create<UIStoreType>()(
       showSearch: false,
       showNotifications: false,
       showCallControls: false,
+      showThemeSelector: false,
       isTyping: false,
       typingUsers: {},
 
@@ -146,6 +149,10 @@ const useUIStore = create<UIStoreType>()(
         set((state) => ({ showCallControls: !state.showCallControls }));
       },
 
+      toggleThemeSelector: () => {
+        set((state) => ({ showThemeSelector: !state.showThemeSelector }));
+      },
+
       setTyping: (isTyping: boolean) => {
         set({ isTyping });
       },
@@ -189,6 +196,7 @@ const useUIStore = create<UIStoreType>()(
           showSearch: false,
           showNotifications: false,
           showCallControls: false,
+          showThemeSelector: false,
         });
       },
     }),
