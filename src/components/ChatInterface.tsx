@@ -10,7 +10,6 @@ import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import LoadingSpinner from './LoadingSpinner';
 import CallModal from './CallModal';
-import MobileHeader from './MobileHeader';
 
 export default function ChatInterface() {
   const { user } = useAuthStore();
@@ -32,12 +31,18 @@ export default function ChatInterface() {
   // Call state
   const [showCallModal, setShowCallModal] = useState(false);
   const [isIncomingCall, setIsIncomingCall] = useState(false);
-  const [incomingCallData, setIncomingCallData] = useState<any>(null);
+  const [incomingCallData, setIncomingCallData] = useState<{
+    caller: { _id: string; firstName: string; lastName: string };
+    offer: RTCSessionDescriptionInit;
+  } | null>(null);
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
 
   // Handle incoming calls
   useEffect(() => {
-    const handleIncomingCall = (data: any) => {
+    const handleIncomingCall = (data: {
+      caller: { _id: string; firstName: string; lastName: string };
+      offer: RTCSessionDescriptionInit;
+    }) => {
       console.log('ChatInterface: Incoming call data:', data);
       setIncomingCallData(data);
       setIncomingOffer(data.offer);
@@ -52,7 +57,7 @@ export default function ChatInterface() {
     };
   }, []);
 
-  const handleStartCall = (isVideo: boolean = false) => {
+  const handleStartCall = () => {
     if (currentChat) {
       setShowCallModal(true);
       setIsIncomingCall(false);
@@ -131,9 +136,9 @@ export default function ChatInterface() {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-gray-800">
+    <div className="flex-1 flex flex-col bg-white dark:bg-gray-800 h-full overflow-hidden">
       {/* Desktop Chat Header */}
-      <div className="hidden lg:flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <div className="hidden lg:flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
         <div className="flex items-center space-x-3">
           {/* Chat Avatar */}
           <div className="relative">
@@ -232,7 +237,7 @@ export default function ChatInterface() {
         <div className="flex items-center space-x-2">
           {/* Call Button */}
           <button
-            onClick={() => handleStartCall(false)}
+            onClick={handleStartCall}
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
             title="Start call"
           >
@@ -243,7 +248,7 @@ export default function ChatInterface() {
 
           {/* Video Call Button */}
           <button
-            onClick={() => handleStartCall(true)}
+            onClick={handleStartCall}
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
             title="Start video call"
           >
@@ -265,7 +270,7 @@ export default function ChatInterface() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 bg-gray-50 dark:bg-gray-900 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <LoadingSpinner />
@@ -315,10 +320,12 @@ export default function ChatInterface() {
 
       {/* Message Input */}
       {currentChat && (
-        <MessageInput 
-          chatId={currentChat._id}
-          onTyping={setTyping}
-        />
+        <div className="flex-shrink-0">
+          <MessageInput 
+            chatId={currentChat._id}
+            onTyping={setTyping}
+          />
+        </div>
       )}
 
       {/* Call Modal */}

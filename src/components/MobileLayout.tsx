@@ -7,11 +7,29 @@ import useChatStore from '@/store/chatStore';
 import Sidebar from './Sidebar';
 import ChatInterface from './ChatInterface';
 import MobileHeader from './MobileHeader';
+import webrtcService from '@/lib/webrtc';
 
 export default function MobileLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { currentChat } = useChatStore();
   const { user } = useAuthStore();
+
+  // Call handlers
+  const handleAudioCall = () => {
+    if (currentChat) {
+      // Trigger audio call
+      console.log('Starting audio call for chat:', currentChat._id);
+      // You can integrate with your call system here
+    }
+  };
+
+  const handleVideoCall = () => {
+    if (currentChat) {
+      // Trigger video call
+      console.log('Starting video call for chat:', currentChat._id);
+      // You can integrate with your call system here
+    }
+  };
 
   // Close sidebar when chat is selected on mobile
   useEffect(() => {
@@ -29,9 +47,9 @@ export default function MobileLayout() {
   };
 
   return (
-    <div className="h-screen flex flex-col lg:flex-row bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="h-screen flex flex-col lg:flex-row bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
       {/* Mobile Header */}
-      <div className="lg:hidden">
+      <div className="lg:hidden flex-shrink-0">
         <MobileHeader 
           onMenuToggle={handleMenuToggle}
           title={currentChat ? 
@@ -46,6 +64,8 @@ export default function MobileLayout() {
           }
           showBackButton={!!currentChat}
           onBack={handleBackToChats}
+          onAudioCall={handleAudioCall}
+          onVideoCall={handleVideoCall}
         />
       </div>
       
@@ -57,16 +77,18 @@ export default function MobileLayout() {
         />
       )}
       
-      {/* Sidebar */}
+      {/* Sidebar - Fixed height and scrollable */}
       <div className={`
-        fixed lg:relative inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0
+        fixed lg:relative inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:h-full
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <Sidebar />
+        <div className="h-full overflow-y-auto">
+          <Sidebar />
+        </div>
       </div>
       
-      {/* Main Chat Interface */}
-      <div className="flex-1 flex flex-col lg:ml-0">
+      {/* Main Chat Interface - Fixed height */}
+      <div className="flex-1 flex flex-col lg:ml-0 h-full overflow-hidden">
         <ChatInterface />
       </div>
     </div>
