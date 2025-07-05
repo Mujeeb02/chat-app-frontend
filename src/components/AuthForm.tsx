@@ -24,6 +24,7 @@ export default function AuthForm() {
 
     try {
       if (isLogin) {
+        console.log('Login formData:', formData);
         await login(formData.email, formData.password);
       } else {
         // Validate passwords match
