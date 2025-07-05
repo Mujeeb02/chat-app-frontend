@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import useAuthStore from '@/store/authStore';
 import useChatStore from '@/store/chatStore';
 import useUIStore from '@/store/uiStore';
-import webrtcService from '@/lib/webrtc';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import LoadingSpinner from './LoadingSpinner';
 import CallModal from './CallModal';
+import { useCall } from '@/hooks/useCall';
 
 export default function ChatInterface() {
   const { user } = useAuthStore();
@@ -25,51 +25,16 @@ export default function ChatInterface() {
   const { 
     toggleCreateChat
   } = useUIStore();
+  const {
+    showCallModal,
+    isIncomingCall,
+    incomingCallData,
+    incomingOffer,
+    handleStartCall,
+    handleCloseCallModal
+  } = useCall();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Call state
-  const [showCallModal, setShowCallModal] = useState(false);
-  const [isIncomingCall, setIsIncomingCall] = useState(false);
-  const [incomingCallData, setIncomingCallData] = useState<{
-    caller: { _id: string; firstName: string; lastName: string };
-    offer: RTCSessionDescriptionInit;
-  } | null>(null);
-  const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
-
-  // Handle incoming calls
-  useEffect(() => {
-    const handleIncomingCall = (data: {
-      caller: { _id: string; firstName: string; lastName: string };
-      offer: RTCSessionDescriptionInit;
-    }) => {
-      console.log('ChatInterface: Incoming call data:', data);
-      setIncomingCallData(data);
-      setIncomingOffer(data.offer);
-      setIsIncomingCall(true);
-      setShowCallModal(true);
-    };
-
-    webrtcService.on('call:incoming', handleIncomingCall);
-
-    return () => {
-      webrtcService.off('call:incoming', handleIncomingCall);
-    };
-  }, []);
-
-  const handleStartCall = () => {
-    if (currentChat) {
-      setShowCallModal(true);
-      setIsIncomingCall(false);
-    }
-  };
-
-  const handleCloseCallModal = () => {
-    setShowCallModal(false);
-    setIsIncomingCall(false);
-    setIncomingCallData(null);
-    setIncomingOffer(null);
-  };
 
   useEffect(() => {
     if (user) {
@@ -237,7 +202,7 @@ export default function ChatInterface() {
         <div className="flex items-center space-x-2">
           {/* Call Button */}
           <button
-            onClick={handleStartCall}
+            onClick={() => handleStartCall(false)}
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
             title="Start call"
           >
@@ -248,7 +213,7 @@ export default function ChatInterface() {
 
           {/* Video Call Button */}
           <button
-            onClick={handleStartCall}
+            onClick={() => handleStartCall(true)}
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
             title="Start video call"
           >
@@ -333,7 +298,7 @@ export default function ChatInterface() {
         <CallModal
           isOpen={showCallModal}
           onClose={handleCloseCallModal}
-          onOpen={() => setShowCallModal(true)}
+          onOpen={() => handleStartCall(false)}
           chatId={currentChat._id}
           isIncoming={isIncomingCall}
           caller={incomingCallData?.caller}

@@ -7,28 +7,21 @@ import useChatStore from '@/store/chatStore';
 import Sidebar from './Sidebar';
 import ChatInterface from './ChatInterface';
 import MobileHeader from './MobileHeader';
-import webrtcService from '@/lib/webrtc';
+import { useCall } from '@/hooks/useCall';
 
 export default function MobileLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { currentChat } = useChatStore();
   const { user } = useAuthStore();
+  const { handleStartCall } = useCall();
 
   // Call handlers
   const handleAudioCall = () => {
-    if (currentChat) {
-      // Trigger audio call
-      console.log('Starting audio call for chat:', currentChat._id);
-      // You can integrate with your call system here
-    }
+    handleStartCall(false); // false for audio call
   };
 
   const handleVideoCall = () => {
-    if (currentChat) {
-      // Trigger video call
-      console.log('Starting video call for chat:', currentChat._id);
-      // You can integrate with your call system here
-    }
+    handleStartCall(true); // true for video call
   };
 
   // Close sidebar when chat is selected on mobile
