@@ -15,41 +15,89 @@ export const useCall = () => {
     offer: RTCSessionDescriptionInit;
   } | null>(null);
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
+  const [callType, setCallType] = useState<'audio' | 'video' | null>(null);
 
   // Handle incoming calls
   useEffect(() => {
     const handleIncomingCall = (data: {
       caller: { _id: string; firstName: string; lastName: string };
       offer: RTCSessionDescriptionInit;
+      isVideo: boolean;
     }) => {
       console.log('Incoming call data:', data);
       setIncomingCallData(data);
       setIncomingOffer(data.offer);
+      setCallType(data.isVideo ? 'video' : 'audio');
       setIsIncomingCall(true);
       setShowCallModal(true);
     };
 
+    const handleCallStarted = (data: { chatId: string; isVideo: boolean }) => {
+      console.log('Call started:', data);
+      setCallType(data.isVideo ? 'video' : 'audio');
+      setShowCallModal(true);
+    };
+
+    const handleCallError = (error: Error) => {
+      console.error('Call error:', error);
+      // You might want to show a toast notification here
+      setShowCallModal(false);
+      setIsIncomingCall(false);
+      setIncomingCallData(null);
+      setIncomingOffer(null);
+      setCallType(null);
+    };
+
+    const handleCallEnded = () => {
+      console.log('Call ended');
+      setShowCallModal(false);
+      setIsIncomingCall(false);
+      setIncomingCallData(null);
+      setIncomingOffer(null);
+      setCallType(null);
+    };
+
+    // Set up event listeners
     webrtcService.on('call:incoming', handleIncomingCall);
+    webrtcService.on('call:started', handleCallStarted);
+    webrtcService.on('call:error', handleCallError);
+    webrtcService.on('call:ended', handleCallEnded);
 
     return () => {
       webrtcService.off('call:incoming', handleIncomingCall);
+      webrtcService.off('call:started', handleCallStarted);
+      webrtcService.off('call:error', handleCallError);
+      webrtcService.off('call:ended', handleCallEnded);
     };
   }, []);
 
-  const handleStartCall = (isVideo: boolean = false) => {
-    if (currentChat && user) {
+  const handleStartCall = async (isVideo: boolean = false) => {
+    if (!currentChat || !user) {
+      console.error('No current chat or user');
+      return;
+    }
+
+    try {
       console.log(`Starting ${isVideo ? 'video' : 'audio'} call for chat:`, currentChat._id);
+      
+      // Check if we're already in a call
+      if (webrtcService.isInCall()) {
+        console.log('Already in a call');
+        return;
+      }
+
+      // Start the call using WebRTC service
+      await webrtcService.startCall(currentChat._id, isVideo);
+      
+      setCallType(isVideo ? 'video' : 'audio');
       setShowCallModal(true);
       setIsIncomingCall(false);
       setIncomingCallData(null);
       setIncomingOffer(null);
       
-      // Here you would trigger the actual call
-      // For now, we'll just open the modal
-      // In a real implementation, you would:
-      // 1. Create a call offer
-      // 2. Send it to the other participants
-      // 3. Handle the WebRTC connection
+    } catch (error) {
+      console.error('Failed to start call:', error);
+      // You might want to show a toast notification here
     }
   };
 
@@ -58,29 +106,47 @@ export const useCall = () => {
     setIsIncomingCall(false);
     setIncomingCallData(null);
     setIncomingOffer(null);
+    setCallType(null);
   };
 
-  const handleAnswerCall = () => {
-    if (incomingOffer && currentChat) {
+  const handleAnswerCall = async () => {
+    if (!incomingOffer || !currentChat) {
+      console.error('No incoming offer or current chat');
+      return;
+    }
+
+    try {
       console.log('Answering incoming call');
-      // Handle answering the call
-      // In a real implementation, you would:
-      // 1. Create an answer
-      // 2. Send it back to the caller
-      // 3. Establish the WebRTC connection
+      
+      // Accept the call using WebRTC service
+      await webrtcService.acceptCall(currentChat._id, incomingOffer);
+      
+      setShowCallModal(true);
+      setIsIncomingCall(false);
+      setIncomingCallData(null);
+      setIncomingOffer(null);
+      
+    } catch (error) {
+      console.error('Failed to answer call:', error);
+      // You might want to show a toast notification here
     }
   };
 
   const handleRejectCall = () => {
+    if (!currentChat) {
+      console.error('No current chat');
+      return;
+    }
+
     console.log('Rejecting incoming call');
+    webrtcService.rejectCall(currentChat._id);
     handleCloseCallModal();
-    // Send rejection signal to caller
   };
 
   const handleEndCall = () => {
     console.log('Ending call');
+    webrtcService.endCall();
     handleCloseCallModal();
-    // Send end call signal to participants
   };
 
   return {
@@ -88,6 +154,7 @@ export const useCall = () => {
     isIncomingCall,
     incomingCallData,
     incomingOffer,
+    callType,
     handleStartCall,
     handleCloseCallModal,
     handleAnswerCall,

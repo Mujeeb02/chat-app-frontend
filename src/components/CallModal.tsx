@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import webrtcService from '@/lib/webrtc';
 import useAuthStore from '@/store/authStore';
+import { useCall } from '@/hooks/useCall';
 
 interface CallModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
   const [callStatus, setCallStatus] = useState<'connecting' | 'connected' | 'failed' | 'idle' | 'incoming'>('idle');
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuthStore();
+  const { handleAnswerCall, handleRejectCall, handleEndCall } = useCall();
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -119,14 +121,13 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
       setCallStatus('connecting');
       setError(null);
       
-      // Get the stored offer from incoming call
       console.log('CallModal: Accepting call with offer:', incomingOffer);
       
       if (!incomingOffer) {
         throw new Error('No offer found for incoming call');
       }
       
-      await webrtcService.acceptCall(chatId, incomingOffer);
+      await handleAnswerCall();
       setCallStatus('connected');
     } catch (error) {
       console.error('Failed to accept call:', error);
@@ -135,13 +136,13 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
     }
   };
 
-  const handleRejectCall = () => {
-    webrtcService.rejectCall(chatId);
+  const handleRejectCallModal = () => {
+    handleRejectCall();
     onClose();
   };
 
-  const handleEndCall = () => {
-    webrtcService.endCall();
+  const handleEndCallModal = () => {
+    handleEndCall();
     onClose();
   };
 
@@ -177,15 +178,18 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
               <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
                 callStatus === 'connecting' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                 callStatus === 'connected' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                callStatus === 'incoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
                 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
               }`}>
                 <div className={`w-2 h-2 rounded-full mr-2 ${
                   callStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' :
                   callStatus === 'connected' ? 'bg-green-500' :
+                  callStatus === 'incoming' ? 'bg-blue-500 animate-pulse' :
                   'bg-red-500'
                 }`}></div>
                 {callStatus === 'connecting' ? 'Connecting...' :
                  callStatus === 'connected' ? 'Connected' :
+                 callStatus === 'incoming' ? 'Incoming Call...' :
                  'Failed'}
               </div>
             </div>
@@ -272,7 +276,7 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
 
               {/* Reject Call */}
               <button
-                onClick={handleRejectCall}
+                onClick={handleRejectCallModal}
                 className="p-6 bg-red-500 hover:bg-red-600 text-white rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                 title="Reject call"
               >
@@ -313,7 +317,7 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
         {webrtcService.isInCall() && (
           <div className="mt-6 text-center">
             <button
-              onClick={handleEndCall}
+              onClick={handleEndCallModal}
               className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               End Call

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import useAuthStore from '@/store/authStore';
 import useChatStore from '@/store/chatStore';
 import useUIStore from '@/store/uiStore';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
@@ -83,25 +84,25 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-full lg:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden">
+    <div className="sidebar w-full lg:w-80 flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold text-gradient">
             ChatApp
           </h1>
           <div className="flex items-center space-x-2">
             {/* Notifications */}
             <button
               onClick={toggleNotifications}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 relative"
+              className="p-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 focus-ring relative"
               title="Notifications"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.5 3.75a6 6 0 00-6 6v3.75l-2.25 2.25v3h15v-3l-2.25-2.25V9.75a6 6 0 00-6-6z" />
               </svg>
               {chats.some(chat => chat.unreadCount > 0) && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
+                <span className="notification-badge">
                   {chats.reduce((total, chat) => total + chat.unreadCount, 0)}
                 </span>
               )}
@@ -110,7 +111,7 @@ export default function Sidebar() {
             {/* Profile */}
             <button
               onClick={toggleProfile}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+              className="p-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 focus-ring"
               title="Profile"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +125,7 @@ export default function Sidebar() {
       {/* User Info */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <div className="avatar w-10 h-10 relative">
             {user?.avatar ? (
               <img 
                 src={user.avatar} 
@@ -136,6 +137,7 @@ export default function Sidebar() {
                 {user?.firstName?.charAt(0).toUpperCase()}
               </span>
             )}
+            <div className="status-indicator online"></div>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
@@ -147,7 +149,7 @@ export default function Sidebar() {
           </div>
           <button
             onClick={handleLogout}
-            className="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors duration-200"
+            className="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 focus-ring"
             title="Logout"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +163,7 @@ export default function Sidebar() {
       <div className="p-4">
         <button
           onClick={toggleCreateChat}
-          className="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="enhanced-button primary w-full flex items-center justify-center"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -171,15 +173,15 @@ export default function Sidebar() {
       </div>
 
       {/* Chats List */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         {isLoading ? (
           <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <LoadingSpinner />
           </div>
         ) : chats.length === 0 ? (
           <div className="p-8 text-center">
-            <div className="w-12 h-12 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center shadow-sm">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
@@ -196,15 +198,15 @@ export default function Sidebar() {
               <button
                 key={chat._id}
                 onClick={() => selectChat(chat._id)}
-                className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                className={`chat-bubble ${
                   currentChat?._id === chat._id 
-                    ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' 
+                    ? 'active' 
                     : ''
                 }`}
               >
                 {/* Chat Avatar */}
                 <div className="relative flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <div className="avatar w-12 h-12">
                     {getChatAvatar(chat) ? (
                       <img 
                         src={getChatAvatar(chat)} 
@@ -221,7 +223,7 @@ export default function Sidebar() {
                     const otherParticipant = chat.participants.find((p: any) => p._id !== user?._id);
                     return otherParticipant?.status === 'online';
                   })() && (
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+                    <div className="status-indicator online"></div>
                   )}
                 </div>
 
@@ -242,7 +244,7 @@ export default function Sidebar() {
                       {formatLastMessage(chat.lastMessage)}
                     </p>
                     {chat.unreadCount > 0 && (
-                      <span className="ml-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                      <span className="badge primary ml-2">
                         {chat.unreadCount}
                       </span>
                     )}

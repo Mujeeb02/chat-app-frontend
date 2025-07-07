@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import useAuthStore from '@/store/authStore';
-import useUIStore from '@/store/uiStore';
 import useChatStore from '@/store/chatStore';
 import Sidebar from './Sidebar';
 import ChatInterface from './ChatInterface';
@@ -15,13 +14,25 @@ export default function MobileLayout() {
   const { user } = useAuthStore();
   const { handleStartCall } = useCall();
 
-  // Call handlers
-  const handleAudioCall = () => {
-    handleStartCall(false); // false for audio call
+  // Call handlers with proper error handling
+  const handleAudioCall = async () => {
+    try {
+      console.log('Initiating audio call...');
+      await handleStartCall(false); // false for audio call
+    } catch (error) {
+      console.error('Failed to initiate audio call:', error);
+      // You might want to show a toast notification here
+    }
   };
 
-  const handleVideoCall = () => {
-    handleStartCall(true); // true for video call
+  const handleVideoCall = async () => {
+    try {
+      console.log('Initiating video call...');
+      await handleStartCall(true); // true for video call
+    } catch (error) {
+      console.error('Failed to initiate video call:', error);
+      // You might want to show a toast notification here
+    }
   };
 
   // Close sidebar when chat is selected on mobile
@@ -65,7 +76,7 @@ export default function MobileLayout() {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -75,7 +86,7 @@ export default function MobileLayout() {
         fixed lg:relative inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:h-full
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-auto custom-scrollbar">
           <Sidebar />
         </div>
       </div>

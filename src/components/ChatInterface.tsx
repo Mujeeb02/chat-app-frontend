@@ -56,10 +56,36 @@ export default function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Call handlers with proper error handling
+  const handleAudioCall = async () => {
+    try {
+      console.log('Initiating audio call from chat interface...');
+      await handleStartCall(false);
+    } catch (error) {
+      console.error('Failed to initiate audio call:', error);
+      // You might want to show a toast notification here
+    }
+  };
+
+  const handleVideoCall = async () => {
+    try {
+      console.log('Initiating video call from chat interface...');
+      await handleStartCall(true);
+    } catch (error) {
+      console.error('Failed to initiate video call:', error);
+      // You might want to show a toast notification here
+    }
+  };
+
   if (!user) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="flex-1 flex items-center justify-center chat-interface">
         <div className="text-center">
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Welcome to ChatApp
           </h2>
@@ -73,10 +99,10 @@ export default function ChatInterface() {
 
   if (!currentChat) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="flex-1 flex items-center justify-center chat-interface">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
@@ -88,7 +114,7 @@ export default function ChatInterface() {
           </p>
           <button
             onClick={toggleCreateChat}
-            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="enhanced-button primary inline-flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -107,7 +133,7 @@ export default function ChatInterface() {
         <div className="flex items-center space-x-3">
           {/* Chat Avatar */}
           <div className="relative">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="avatar w-10 h-10">
               {currentChat.type === 'direct' && currentChat.participants.length > 0 ? (
                 // For direct chats, show the other participant's avatar
                 (() => {
@@ -143,9 +169,7 @@ export default function ChatInterface() {
                 const otherParticipant = currentChat.participants.find(p => p._id !== user._id);
                 const isOnline = otherParticipant?.status === 'online';
                 return (
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white dark:border-gray-800 ${
-                    isOnline ? 'bg-green-500' : 'bg-gray-400'
-                  }`} />
+                  <div className={`status-indicator ${isOnline ? 'online' : 'offline'}`} />
                 );
               })()
             )}
@@ -202,8 +226,8 @@ export default function ChatInterface() {
         <div className="flex items-center space-x-2">
           {/* Call Button */}
           <button
-            onClick={() => handleStartCall(false)}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+            onClick={handleAudioCall}
+            className="call-button audio p-2.5 transition-all duration-200 transform hover:scale-110 active:scale-95 focus-ring"
             title="Start call"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,8 +237,8 @@ export default function ChatInterface() {
 
           {/* Video Call Button */}
           <button
-            onClick={() => handleStartCall(true)}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+            onClick={handleVideoCall}
+            className="call-button video p-2.5 transition-all duration-200 transform hover:scale-110 active:scale-95 focus-ring"
             title="Start video call"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +248,7 @@ export default function ChatInterface() {
 
           {/* More Options */}
           <button
-            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+            className="p-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 focus-ring"
             title="More options"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +259,7 @@ export default function ChatInterface() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4 bg-gray-50 dark:bg-gray-900 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 bg-gray-50 dark:bg-gray-900 custom-scrollbar">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <LoadingSpinner />
@@ -246,7 +270,7 @@ export default function ChatInterface() {
               <p className="text-red-600 dark:text-red-400 mb-2">{error}</p>
               <button
                 onClick={() => currentChat && fetchMessages(currentChat._id)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                className="enhanced-button primary"
               >
                 Retry
               </button>
@@ -255,7 +279,7 @@ export default function ChatInterface() {
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center shadow-sm">
                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
@@ -285,7 +309,7 @@ export default function ChatInterface() {
 
       {/* Message Input */}
       {currentChat && (
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 message-input-container">
           <MessageInput 
             chatId={currentChat._id}
             onTyping={setTyping}

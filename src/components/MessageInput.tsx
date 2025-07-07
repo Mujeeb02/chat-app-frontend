@@ -205,17 +205,17 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
   };
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 sm:p-4">
+    <div className="message-input-container">
       {/* File Preview */}
       {filePreview && (
-        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
+        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl shadow-sm">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               File Preview
             </span>
             <button
               onClick={handleCancelFile}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus-ring"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -228,25 +228,25 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
               <img
                 src={filePreview.preview}
                 alt="Preview"
-                className="w-16 h-16 object-cover rounded-lg"
+                className="w-16 h-16 object-cover rounded-xl shadow-sm"
               />
             )}
             {filePreview.type === 'video' && (
               <video
                 src={filePreview.preview}
-                className="w-16 h-16 object-cover rounded-lg"
+                className="w-16 h-16 object-cover rounded-xl shadow-sm"
                 controls
               />
             )}
             {filePreview.type === 'audio' && (
-              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-xl flex items-center justify-center shadow-sm">
                 <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
               </div>
             )}
             {filePreview.type === 'file' && (
-              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-xl flex items-center justify-center shadow-sm">
                 <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -265,11 +265,11 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
             <button
               onClick={handleSendFile}
               disabled={uploadingFile}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-lg transition-colors duration-200 disabled:cursor-not-allowed"
+              className="enhanced-button primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploadingFile ? (
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="loading-spinner"></div>
                   <span>Uploading...</span>
                 </div>
               ) : (
@@ -286,7 +286,7 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
           <button
             type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            className="flex-shrink-0 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+            className="flex-shrink-0 p-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 focus-ring"
             title="Add emoji"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,11 +308,11 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
           type="button"
           onClick={triggerFileUpload}
           disabled={uploadingFile}
-          className="flex-shrink-0 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 disabled:opacity-50"
+          className="flex-shrink-0 p-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 disabled:opacity-50 focus-ring"
           title="Attach file"
         >
           {uploadingFile ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
+            <div className="loading-spinner"></div>
           ) : (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
@@ -337,7 +337,7 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
             onChange={(e) => handleTyping(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[44px] max-h-[120px] text-sm sm:text-base"
+            className="enhanced-input w-full pr-12 resize-none min-h-[44px] max-h-[120px] text-sm sm:text-base"
             rows={1}
           />
           
@@ -345,11 +345,11 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
           <button
             type="submit"
             disabled={!message.trim() || isSubmitting}
-            className="absolute right-2 bottom-2 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-lg transition-colors duration-200 disabled:cursor-not-allowed"
+            className="absolute right-2 bottom-2 p-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-600 dark:disabled:to-gray-700 text-white rounded-xl transition-all duration-200 disabled:cursor-not-allowed shadow-sm hover:shadow-md focus-ring"
             title="Send message"
           >
             {isSubmitting ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <div className="loading-spinner"></div>
             ) : (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -361,11 +361,11 @@ export default function MessageInput({ chatId, onTyping }: MessageInputProps) {
 
       {/* Typing Indicator */}
       {isTyping && (
-        <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-          <div className="flex space-x-1">
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+          <div className="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
           <span>Typing...</span>
         </div>
