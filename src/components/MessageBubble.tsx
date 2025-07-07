@@ -20,9 +20,41 @@ export default function MessageBubble({ message, isOwnMessage }: MessageBubblePr
   const { user } = useAuthStore();
 
   const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, 'HH:mm');
+    try {
+      const date = new Date(dateString);
+      return format(date, 'HH:mm');
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return '--:--';
+    }
   };
+
+  // Safely get sender information with fallbacks
+  const getSenderInfo = () => {
+    if (!message.sender) {
+      console.warn('Message has no sender information:', message);
+      return {
+        firstName: 'Unknown',
+        lastName: 'User',
+        avatar: undefined,
+        initials: 'U'
+      };
+    }
+
+    const firstName = message.sender.firstName || 'Unknown';
+    const lastName = message.sender.lastName || 'User';
+    const avatar = message.sender.avatar;
+    const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase();
+
+    return {
+      firstName,
+      lastName,
+      avatar,
+      initials
+    };
+  };
+
+  const senderInfo = getSenderInfo();
 
   const renderMessageContent = () => {
     switch (message.type) {
@@ -154,15 +186,27 @@ export default function MessageBubble({ message, isOwnMessage }: MessageBubblePr
         {/* Avatar - Only show for received messages */}
         {!isOwnMessage && (
           <div className="avatar w-8 h-8 flex-shrink-0">
-            {message.sender.avatar ? (
+            {senderInfo.avatar ? (
               <img 
-                src={message.sender.avatar} 
-                alt={`${message.sender.firstName} ${message.sender.lastName}`}
+                src={senderInfo.avatar} 
+                alt={`${senderInfo.firstName} ${senderInfo.lastName}`}
                 className="w-8 h-8 rounded-full object-cover"
+                onError={(e) => {
+                  // Fallback to initials if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    const fallback = document.createElement('span');
+                    fallback.className = 'text-white font-semibold text-xs';
+                    fallback.textContent = senderInfo.initials;
+                    parent.appendChild(fallback);
+                  }
+                }}
               />
             ) : (
               <span className="text-white font-semibold text-xs">
-                {message.sender.firstName.charAt(0).toUpperCase()}
+                {senderInfo.initials}
               </span>
             )}
           </div>
@@ -173,7 +217,7 @@ export default function MessageBubble({ message, isOwnMessage }: MessageBubblePr
           {/* Sender Name - Only for group chats and received messages */}
           {!isOwnMessage && currentChat?.type === 'group' && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 px-1">
-              {message.sender.firstName} {message.sender.lastName}
+              {senderInfo.firstName} {senderInfo.lastName}
             </p>
           )}
 

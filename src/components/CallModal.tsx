@@ -21,11 +21,21 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [callStatus, setCallStatus] = useState<'connecting' | 'connected' | 'failed' | 'idle' | 'incoming'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [callType, setCallType] = useState<'audio' | 'video'>('video');
   const { user } = useAuthStore();
   const { handleAnswerCall, handleRejectCall, handleEndCall } = useCall();
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Update call type when incoming call is received
+  useEffect(() => {
+    if (isIncoming && incomingOffer) {
+      // Try to determine call type from the offer or default to video
+      // In a real implementation, you might get this from the incoming call data
+      setCallType('video'); // Default to video, but this should come from the call data
+    }
+  }, [isIncoming, incomingOffer]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -93,16 +103,16 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
   }, [isIncoming, incomingOffer]);
 
   useEffect(() => {
-    if (localVideoRef.current && localStream) {
+    if (localVideoRef.current && localStream && callType === 'video') {
       localVideoRef.current.srcObject = localStream;
     }
-  }, [localStream]);
+  }, [localStream, callType]);
 
   useEffect(() => {
-    if (remoteVideoRef.current && remoteStream) {
+    if (remoteVideoRef.current && remoteStream && callType === 'video') {
       remoteVideoRef.current.srcObject = remoteStream;
     }
-  }, [remoteStream]);
+  }, [remoteStream, callType]);
 
   const handleStartCall = async () => {
     try {
@@ -203,45 +213,63 @@ export default function CallModal({ isOpen, onClose, chatId, isIncoming = false,
           )}
         </div>
 
-        {/* Video Preview */}
-        <div className="mb-8">
-          <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl overflow-hidden aspect-video">
-            {localStream ? (
-              <video
-                ref={localVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    {isIncoming ? 'Waiting for call...' : 'Camera preview'}
-                  </p>
-                </div>
-              </div>
-            )}
-            
-            {/* Remote Video (Picture-in-Picture) */}
-            {remoteStream && (
-              <div className="absolute top-4 right-4 w-32 h-24 bg-black rounded-lg overflow-hidden border-2 border-white shadow-lg">
+        {/* Video Preview - Only show for video calls */}
+        {callType === 'video' && (
+          <div className="mb-8">
+            <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl overflow-hidden aspect-video">
+              {localStream ? (
                 <video
-                  ref={remoteVideoRef}
+                  ref={localVideoRef}
                   autoPlay
+                  muted
                   playsInline
                   className="w-full h-full object-cover"
                 />
-              </div>
-            )}
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                      {isIncoming ? 'Waiting for call...' : 'Camera preview'}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Remote Video (Picture-in-Picture) */}
+              {remoteStream && (
+                <div className="absolute top-4 right-4 w-32 h-24 bg-black rounded-lg overflow-hidden border-2 border-white shadow-lg">
+                  <video
+                    ref={remoteVideoRef}
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Audio Call Indicator */}
+        {callType === 'audio' && (
+          <div className="mb-8">
+            <div className="flex items-center justify-center">
+              <div className="w-24 h-24 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+            </div>
+            <p className="text-center text-gray-600 dark:text-gray-400">
+              {isIncoming ? 'Incoming audio call...' : 'Audio call'}
+            </p>
+          </div>
+        )}
 
         {/* Call Options */}
         {!isIncoming && callStatus === 'idle' && (

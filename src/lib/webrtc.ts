@@ -89,11 +89,15 @@ class WebRTCService extends EventEmitter {
     try {
       this.currentChatId = chatId;
       
-      // Get user media
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // Get user media based on call type
+      const mediaConstraints = {
         audio: true,
-        video: isVideo,
-      });
+        video: isVideo ? true : false, // Only request video if it's a video call
+      };
+
+      console.log('WebRTC: Requesting media with constraints:', mediaConstraints);
+      
+      const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
       this.state.localStream = stream;
       this.state.isInCall = true;
@@ -180,18 +184,22 @@ class WebRTCService extends EventEmitter {
     this.state.pendingIceCandidates = [];
   }
 
-  async acceptCall(chatId: string, offer?: RTCSessionDescriptionInit): Promise<void> {
+  async acceptCall(chatId: string, offer?: RTCSessionDescriptionInit, isVideo: boolean = true): Promise<void> {
     try {
-      console.log('Accepting call for chat:', chatId, 'Offer:', offer);
+      console.log('Accepting call for chat:', chatId, 'Offer:', offer, 'IsVideo:', isVideo);
       
       this.currentChatId = chatId;
       this.state.isInCall = true;
 
-      // Get user media
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+      // Get user media based on call type
+      const mediaConstraints = {
         audio: true,
-      });
+        video: isVideo ? true : false, // Only request video if it's a video call
+      };
+
+      console.log('WebRTC: Accepting call with media constraints:', mediaConstraints);
+      
+      const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
       this.state.localStream = stream;
 

@@ -118,8 +118,11 @@ export const useCall = () => {
     try {
       console.log('Answering incoming call');
       
-      // Accept the call using WebRTC service
-      await webrtcService.acceptCall(currentChat._id, incomingOffer);
+      // Determine if this is a video call based on the call type
+      const isVideoCall = callType === 'video';
+      
+      // Accept the call using WebRTC service with the correct call type
+      await webrtcService.acceptCall(currentChat._id, incomingOffer, isVideoCall);
       
       setShowCallModal(true);
       setIsIncomingCall(false);
