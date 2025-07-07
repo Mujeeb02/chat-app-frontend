@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import useAuthStore from '@/store/authStore';
 import useChatStore from '@/store/chatStore';
 import useUIStore from '@/store/uiStore';
+import api from '@/lib/api';
 
 interface User {
   _id: string;
@@ -16,8 +17,8 @@ interface User {
 }
 
 export default function CreateChatModal() {
-  const { user } = useAuthStore();
-  const { createChat } = useChatStore();
+  const { user: currentUser } = useAuthStore();
+  const { createChat, chats } = useChatStore();
   const { showCreateChat, toggleCreateChat } = useUIStore();
   
   const [chatType, setChatType] = useState<'direct' | 'group'>('direct');
@@ -26,46 +27,69 @@ export default function CreateChatModal() {
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Mock users for demonstration
+  // Fetch users when modal opens
   useEffect(() => {
-    const mockUsers: User[] = [
-      {
-        _id: 'user1',
-        firstName: 'John',
-        lastName: 'Doe',
-        username: 'johndoe',
-        email: 'john@example.com',
-        status: 'online'
-      },
-      {
-        _id: 'user2',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        username: 'janesmith',
-        email: 'jane@example.com',
-        status: 'offline'
-      },
-      {
-        _id: 'user3',
-        firstName: 'Alice',
-        lastName: 'Johnson',
-        username: 'alicejohnson',
-        email: 'alice@example.com',
-        status: 'online'
-      },
-      {
-        _id: 'user4',
-        firstName: 'Bob',
-        lastName: 'Wilson',
-        username: 'bobwilson',
-        email: 'bob@example.com',
-        status: 'offline'
+    if (showCreateChat) {
+      fetchUsers();
+    }
+  }, [showCreateChat]);
+
+  const fetchUsers = async () => {
+    try {
+      setIsLoadingUsers(true);
+      setError(null);
+      const response = await api.getAllUsers() as { success: boolean; data?: User[]; error?: string };
+      if (response.success && response.data) {
+        setUsers(response.data);
+      } else {
+        throw new Error(response.error || 'Failed to fetch users');
       }
-    ];
-    setUsers(mockUsers);
-  }, []);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch users');
+      // Fallback to mock data for development
+      const mockUsers: User[] = [
+        {
+          _id: 'user1',
+          firstName: 'John',
+          lastName: 'Doe',
+          username: 'johndoe',
+          email: 'john@example.com',
+          status: 'online'
+        },
+        {
+          _id: 'user2',
+          firstName: 'Jane',
+          lastName: 'Smith',
+          username: 'janesmith',
+          email: 'jane@example.com',
+          status: 'offline'
+        },
+        {
+          _id: 'user3',
+          firstName: 'Alice',
+          lastName: 'Johnson',
+          username: 'alicejohnson',
+          email: 'alice@example.com',
+          status: 'online'
+        },
+        {
+          _id: 'user4',
+          firstName: 'Bob',
+          lastName: 'Wilson',
+          username: 'bobwilson',
+          email: 'bob@example.com',
+          status: 'offline'
+        }
+      ];
+      setUsers(mockUsers);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
 
   const handleUserToggle = (userId: string) => {
     if (chatType === 'direct') {
@@ -122,8 +146,16 @@ export default function CreateChatModal() {
     toggleCreateChat();
   };
 
+  // Get users who are already in direct chats with current user
+  const existingDirectChatUsers = chats
+    .filter(chat => chat.type === 'direct')
+    .flatMap(chat => chat.participants)
+    .filter(participant => participant._id !== currentUser?._id)
+    .map(participant => participant._id);
+
   const filteredUsers = users.filter(user => 
-    user._id !== user?._id && // Exclude current user
+    user._id !== currentUser?._id && // Exclude current user
+    !existingDirectChatUsers.includes(user._id) && // Exclude users already in direct chats
     (user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
      user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
      user.username.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -240,7 +272,18 @@ export default function CreateChatModal() {
         {/* Users List */}
         <div className="mb-8">
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {filteredUsers.length === 0 ? (
+            {isLoadingUsers ? (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-gray-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  Loading users...
+                </p>
+              </div>
+            ) : filteredUsers.length === 0 ? (
               <div className="text-center py-8">
                 <div className="w-12 h-12 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
