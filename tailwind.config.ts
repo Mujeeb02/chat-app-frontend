@@ -46,6 +46,15 @@ const config: Config = {
         'slide-down': 'slideDown 0.3s ease-out',
         'bounce-in': 'bounceIn 0.6s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'blob': 'blob 7s infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'gradient-shift': 'gradient-shift 3s ease infinite',
+        'slide-in-right': 'slide-in-right 0.3s ease-out',
+        'slide-in-left': 'slide-in-left 0.3s ease-out',
+        'slide-in-bottom': 'slide-in-bottom 0.3s ease-out',
+        'zoom-in': 'zoom-in 0.3s ease-out',
+        'typing': 'typing 1.4s infinite ease-in-out',
+        'wave': 'wave 1.2s infinite ease-in-out',
       },
       keyframes: {
         fadeIn: {
