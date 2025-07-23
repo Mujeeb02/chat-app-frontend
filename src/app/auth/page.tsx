@@ -2,18 +2,39 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import AuthForm from '@/components/AuthForm';
 import Link from 'next/link';
+import useAuthStore from '@/store/authStore';
 
 export default function AuthPage() {
   const [mounted, setMounted] = useState(false);
+  const { isAuthenticated, initialize } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    initialize();
+  }, [initialize]);
+
+  // Redirect to chat if already authenticated
+  useEffect(() => {
+    if (mounted && isAuthenticated) {
+      router.push('/chat');
+    }
+  }, [mounted, isAuthenticated, router]);
 
   if (!mounted) {
     return null;
+  }
+
+  // Show loading while checking authentication
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-500"></div>
+      </div>
+    );
   }
 
   return (

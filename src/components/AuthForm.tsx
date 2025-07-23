@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
 
 export default function AuthForm() {
@@ -20,6 +21,7 @@ export default function AuthForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { login, register, error, clearError } = useAuthStore();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +45,9 @@ export default function AuthForm() {
           lastName: formData.lastName,
         });
       }
+      
+      // Redirect to chat page after successful authentication
+      router.push('/chat');
     } catch (error) {
       console.error("Auth error:", error);
     } finally {

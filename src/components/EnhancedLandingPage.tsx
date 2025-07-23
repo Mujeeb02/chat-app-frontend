@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import MobileLanding from './MobileLanding';
+import useAuthStore from '@/store/authStore';
 
 const EnhancedLandingPage = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -12,9 +14,12 @@ const EnhancedLandingPage = () => {
   const y2 = useTransform(scrollY, [0, 300], [0, -100]);
   const opacity1 = useTransform(scrollY, [0, 200], [1, 0.5]);
   const scale1 = useTransform(scrollY, [0, 300], [1, 0.9]);
+  const { isAuthenticated, initialize } = useAuthStore();
+  const router = useRouter();
   
   useEffect(() => {
     setIsVisible(true);
+    initialize();
     
     // Add scroll animation for elements
     const animateOnScroll = () => {
@@ -34,7 +39,14 @@ const EnhancedLandingPage = () => {
     animateOnScroll(); // Run once on load
     
     return () => window.removeEventListener('scroll', animateOnScroll);
-  }, []);
+  }, [initialize]);
+
+  // Redirect to chat if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/chat');
+    }
+  }, [isAuthenticated, router]);
 
   const features = [
     {
