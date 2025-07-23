@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import useAuthStore from "@/store/authStore";
 
 export default function AuthForm() {
@@ -14,6 +16,8 @@ export default function AuthForm() {
     lastName: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { login, register, error, clearError } = useAuthStore();
 
@@ -67,31 +71,51 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="w-full max-w-md animate-zoom-in">
-      <div className="relative group">
-        {/* Animated Border Gradient */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-gradient-shift"></div>
+    <div className="w-full max-w-md">
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="relative group"
+      >
+        {/* Enhanced Animated Border Gradient */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200 animate-gradient-x"></div>
 
-        {/* Main Card */}
-        <div className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700/30 p-8 overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-transparent to-purple-50/50 dark:from-indigo-950/30 dark:to-purple-950/30"></div>
+        {/* Main Card with Glass Effect */}
+        <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl rounded-2xl shadow-2xl border border-white/40 dark:border-gray-700/40 p-8 overflow-hidden">
+          {/* Enhanced Background Pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/60 via-transparent to-purple-50/60 dark:from-indigo-950/40 dark:to-purple-950/40"></div>
 
-          {/* Floating Orbs */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-2xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-purple-400/20 to-pink-600/20 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+          {/* Animated Mesh Gradient */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob dark:bg-purple-600"></div>
+            <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000 dark:bg-yellow-600"></div>
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000 dark:bg-pink-600"></div>
+          </div>
 
           {/* Content */}
           <div className="relative z-10">
-            {/* Header with Enhanced Typography */}
-            <div className="text-center mb-8">
-              <div className="mb-4">
-                <div className="w-16 h-16 mx-auto bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                  <svg
-                    className="w-8 h-8 text-white"
+            {/* Enhanced Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-center mb-8"
+            >
+              <motion.div
+                className="mb-6"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="w-20 h-20 mx-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl transform hover:shadow-3xl transition-all duration-300">
+                  <motion.svg
+                    className="w-10 h-10 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
                   >
                     <path
                       strokeLinecap="round"
@@ -99,57 +123,71 @@ export default function AuthForm() {
                       strokeWidth={2}
                       d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                     />
-                  </svg>
+                  </motion.svg>
                 </div>
-              </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2 animate-gradient-shift">
-                {isLogin ? "Welcome Back" : "Join ChatApp"}
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-lg">
-                {isLogin
-                  ? "Continue your conversations"
-                  : "Start connecting with others"}
-              </p>
-            </div>
+              </motion.div>
 
-            {/* Demo Credentials with Enhanced Design */}
-            {isLogin && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200/50 dark:border-blue-800/50 backdrop-blur-sm animate-slide-in-bottom">
-                <div className="flex items-center mb-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
-                  <p className="text-sm text-blue-800 dark:text-blue-200 font-semibold">
-                    Demo Credentials
-                  </p>
-                </div>
-                <p className="text-xs text-blue-700 dark:text-blue-300 font-mono bg-blue-100/50 dark:bg-blue-800/30 px-2 py-1 rounded">
-                  demo@example.com • demo123
-                </p>
-              </div>
-            )}
+              <motion.h1
+                className="text-4xl font-bold mb-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient-x">
+                  {isLogin ? "Welcome Back" : "Join ChatApp"}
+                </span>
+              </motion.h1>
+
+              <motion.p
+                className="text-gray-600 dark:text-gray-400 text-lg font-medium"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                {isLogin
+                  ? "Sign in to continue your conversations"
+                  : "Create your account to get started"}
+              </motion.p>
+            </motion.div>
 
             {/* Enhanced Error Message */}
-            {error && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-xl border border-red-200/50 dark:border-red-800/50 backdrop-blur-sm animate-slide-in-bottom">
-                <div className="flex items-center">
-                  <svg
-                    className="w-5 h-5 text-red-500 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                    />
-                  </svg>
-                  <p className="text-sm text-red-800 dark:text-red-200 font-medium">
-                    {error}
-                  </p>
-                </div>
-              </div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-xl border border-red-200/50 dark:border-red-800/50 backdrop-blur-sm"
+                >
+                  <div className="flex items-center">
+                    <motion.svg
+                      className="w-5 h-5 text-red-500 mr-3 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        delay: 0.1,
+                        type: "spring",
+                        stiffness: 200,
+                      }}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </motion.svg>
+                    <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+                      {error}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Enhanced Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -342,7 +380,7 @@ export default function AuthForm() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
