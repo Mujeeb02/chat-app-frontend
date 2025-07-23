@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '@/lib/api';
@@ -48,6 +49,7 @@ interface AuthActions {
     avatar?: string;
   }) => Promise<void>;
   initializeSocket: () => void;
+  initialize: () => void;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -65,7 +67,7 @@ const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         try {
           const response:any = await api.login({ email, password });
-          
+          console.log("response",response);
           if (response.success && response.data) {
             const { user, token } = response.data;
             api.setToken(token);
@@ -213,6 +215,14 @@ const useAuthStore = create<AuthStore>()(
           socketService.connect(token).catch(error => {
             console.error('Failed to initialize socket:', error);
           });
+        }
+      },
+
+      initialize: () => {
+        const { token, isAuthenticated } = get();
+        // Set token in API service if we have one from persisted state
+        if (token && isAuthenticated) {
+          api.setToken(token);
         }
       },
     }),

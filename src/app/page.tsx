@@ -6,10 +6,12 @@ import AuthForm from '@/components/AuthForm';
 import MobileLayout from '@/components/MobileLayout';
 
 export default function Home() {
-  const { user, isAuthenticated, loginWithToken } = useAuthStore();
+  const { user, isAuthenticated, loginWithToken, initialize } = useAuthStore();
 
-  // Check for stored token and OAuth tokens on mount
+  // Initialize auth store and check for stored token and OAuth tokens on mount
   useEffect(() => {
+    // Initialize the auth store to sync token with API service
+    initialize();
     const handleOAuthCallback = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
@@ -36,7 +38,7 @@ export default function Home() {
     };
 
     handleOAuthCallback();
-  }, [loginWithToken]);
+  }, [loginWithToken, initialize]);
 
   if (!isAuthenticated || !user) {
     return (
