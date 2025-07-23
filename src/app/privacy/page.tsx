@@ -55,7 +55,7 @@ export default function PrivacyPage() {
             At ChatApp, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our communication platform. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application.
           </p>
           <p className="text-gray-600 dark:text-gray-300">
-            We reserve the right to make changes to this Privacy Policy at any time and for any reason. We will alert you about any changes by updating the "Last updated" date of this Privacy Policy. You are encouraged to periodically review this Privacy Policy to stay informed of updates.
+            We reserve the right to make changes to this Privacy Policy at any time and for any reason. We will alert you about any changes by updating the &quot;Last updated&quot; date of this Privacy Policy. You are encouraged to periodically review this Privacy Policy to stay informed of updates.
           </p>
         </motion.div>
 
